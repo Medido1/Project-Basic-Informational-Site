@@ -1,46 +1,46 @@
-const http = require('http');
-const path = require('path');
-const fs = require('fs');
+import http from 'http';
+import url from 'url';
+import path from 'path';
+import fs from 'fs/promises';
 
-const server = http.createServer((req, res) => {
-  //build file path
-  let filePath = path.join(
-    __dirname,
-    req.url === '/' ? 'index.html' : req.url
-  )
+const PORT = process.env.PORT || 3000;
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  // Intial content type
-  let contentType = 'text/html'
-
-  // file Extension
-  let extName = path.extname(filePath)
-  if (!extName){
-    filePath += '.html'
-    extName = '.html'
-  }
-
-  //Read file
-  fs.readFile(filePath, (err, content) => {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        // page not found
-        fs.readFile(path.join(__dirname, '404.html'), (err, content) => {
-          res.writeHead(200, {'Content-Type' : 'text/html'})
-          res.end(content, 'utf8')
-        })
-      } else {
-        // some server error
-        res.writeHead(500);
-        res.end(`Server error : ${err.code}`)
-      }
-    } else {
-      //sucess
-      res.writeHead(200, {'Content-Type': contentType})
-      res.end(content, 'utf8')
+//handle Routes
+const getRoute = async (req, res) => {
+  if (req.method === 'GET'){
+    let filePath;
+    if (req.url === '/') {
+      filePath = path.join(__dirname, 'public', 'index.html');
+    } else if (req.url === '/about') {
+      filePath = path.join(__dirname, 'public', 'about.html'); 
+    } else if (req.url === '/contact-me') {
+      filePath = path.join(__dirname, 'public', 'contact-me.html');
     }
-  })
+    else {
+      res.statusCode = 404;
+      filePath = path.join(__dirname, 'public', '404.html');
+    }
+    const data = await fs.readFile(filePath);
+    res.setHeader('Content-type', 'text/html');
+    res.end(data);
+  } else {
+    res.writeHead(405, {'content-type': 'text/plain'});
+    res.end('Method not allowed')
+  }
+}
+
+const server = http.createServer(async (req, res) => {
+  try {
+    await getRoute(req, res)
+
+  } catch (error) {
+    res.writeHead(500, {'Content-type': 'text/plain'});
+    res.end('Server Error');
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`listening on port: ${PORT}`)
 })
-
-const PORT = process.env.PORT || 8080
-
-server.listen(PORT, () => console.log(`Server running on port: ${PORT}`))

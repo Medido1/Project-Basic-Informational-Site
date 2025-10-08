@@ -1,0 +1,27 @@
+{
+  "name": "project-basic-informational-site",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --env-file=.env index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Medido1/Project-Basic-Informational-Site.git"
+  },
+  "keywords": [
+    "nodeJs"
+  ],
+  "author": "Bousalah Nadir",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Medido1/Project-Basic-Informational-Site/issues"
+  },
+  "homepage": "https://github.com/Medido1/Project-Basic-Informational-Site#readme",
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
